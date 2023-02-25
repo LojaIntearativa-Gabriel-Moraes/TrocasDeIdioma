@@ -1,6 +1,6 @@
 package com.example.Troca.Idiomas.model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 import lombok.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

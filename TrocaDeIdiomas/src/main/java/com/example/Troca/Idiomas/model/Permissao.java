@@ -1,13 +1,13 @@
 package com.example.Troca.Idiomas.model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import static javax.persistence.GenerationType.IDENTITY;
+import static jakarta.persistence.GenerationType.IDENTITY;
 
 
 @Entity

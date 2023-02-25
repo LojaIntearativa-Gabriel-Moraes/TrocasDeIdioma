@@ -24,9 +24,6 @@ public class ConversationHandler extends TextWebSocketHandler {
 
   @Autowired
   private UsuarioAutenticadoService usuarioAutenticadoService;
-  public ConversationHandler() {
-    super();
-  }
 
   @Autowired
   public ConversationHandler(SimpMessagingTemplate messagingTemplate) {

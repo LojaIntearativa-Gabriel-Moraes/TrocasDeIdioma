@@ -36,7 +36,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
   public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
     User user = (User) session.getAttributes().get("user");
     String content = message.getPayload();
-    ChatMessage chatMessage = new ChatMessage(user, content);
+    ChatMessage chatMessage = new ChatMessage(user.getId(), content);
     messagingTemplate.convertAndSend("/topic/chat", chatMessage);
   }
 

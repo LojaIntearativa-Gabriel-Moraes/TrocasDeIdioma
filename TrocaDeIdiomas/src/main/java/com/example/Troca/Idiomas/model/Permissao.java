@@ -1,14 +1,14 @@
 package com.example.Troca.Idiomas.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import javax.persistence.*;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import static jakarta.persistence.GenerationType.IDENTITY;
+import static javax.persistence.GenerationType.IDENTITY;
+
 
 @Entity
 @Getter @Setter @EqualsAndHashCode(of = "id") @ToString(of = "id")

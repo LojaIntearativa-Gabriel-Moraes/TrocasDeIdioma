@@ -1,9 +1,13 @@
 package com.example.Troca.Idiomas.model;
 
 
-import jakarta.persistence.*;
+import lombok.Data;
+
+import javax.persistence.*;
+
 
 @Entity
+@Data
 @Table(name = "chat_message")
 public class ChatMessage {
 
@@ -12,13 +16,13 @@ public class ChatMessage {
   private Long id;
 
   @Column(name = "user_id")
-  private User user;
+  private Long userId;
 
   @Column(name = "content")
   private String content;
 
-  public ChatMessage(User user, String content) {
-    this.user = user;
+  public ChatMessage(Long userId, String content) {
+    this.userId = userId;
     this.content = content;
   }
 

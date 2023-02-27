@@ -1,6 +1,6 @@
 logging:
   level:
-    root: DEBUG
+    #root: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 server:
@@ -14,11 +14,12 @@ spring:
   jpa:
     hibernate:
 
-      ddl-auto: create-drop
+
+      #ddl-auto: create-drop
       #ddl-auto: none
 
       #ddl-auto: validate
-      #ddl-auto: update
+      ddl-auto: update
   session:
     store-type: jdbc
     timeout: 1200

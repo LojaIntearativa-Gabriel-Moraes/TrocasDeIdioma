@@ -3,6 +3,8 @@ package com.example.TrocaDeIdioma.model.Response;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 public class IncluirUsuarioRequest {
@@ -15,5 +17,9 @@ public class IncluirUsuarioRequest {
     private String email;
     @NotBlank
     private String senha;
+
+    private List<String> idiomas;
+
+    private BigDecimal valorPorHora;
 
 }

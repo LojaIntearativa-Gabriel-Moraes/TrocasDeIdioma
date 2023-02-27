@@ -14,4 +14,5 @@ public interface ProfessorRepository extends JpaRepository<Professor, Long> {
   List<Professor> findByIdiomas(String language);
 
 
+  Professor findByEmail(String email);
 }

@@ -33,26 +33,6 @@ public class UserController {
   @Autowired
   private UserService userService;
 
-  @PostMapping
-  public ResponseEntity<User> createUser(@RequestBody IncluirUsuarioRequest request) {
-    if (userRepository.findByEmail(request.getEmail()) != null) {
-      throw new ResponseStatusException(HttpStatus.CONFLICT, "E-mail já cadastrado.");
-    }
-
-    request.setSenha(passwordEncoder.encode(request.getSenha()));
-
-    Permissao permissao = new Permissao();
-    permissao.setNome("USER");
-
-
-    User usuario = toEntity(request);
-    usuario.setPermissoes(new ArrayList<Permissao>());
-    usuario.getPermissoes().add(permissao);
-    userRepository.save(usuario);
-
-    return ResponseEntity.status(HttpStatus.CREATED).body(usuario);
-  }
-
   @GetMapping("/{id}")
   public ResponseEntity<User> getUserById(@PathVariable Long id) {
     // Busca o usuário pelo ID no banco de dados

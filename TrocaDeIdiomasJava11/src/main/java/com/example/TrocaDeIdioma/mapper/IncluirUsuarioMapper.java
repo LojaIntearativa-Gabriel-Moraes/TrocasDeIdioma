@@ -10,6 +10,4 @@ public class IncluirUsuarioMapper {
     public static User toEntity(IncluirUsuarioRequest request) {
         return new ModelMapper().map(request, User.class);
     }
-
-
 }

@@ -36,7 +36,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
       .authorizeRequests().antMatchers("/*/publico").permitAll().and()
 
       // deixa POST /login e /usuarios público
-      .authorizeRequests().antMatchers(HttpMethod.POST, "/login", "/users").permitAll().and()
+      .authorizeRequests().antMatchers(HttpMethod.POST, "/login", "/users", "/professores").permitAll().and()
 
       // todas as urls devem ser acessadas por um usuário autenticado (privadas)
       .authorizeRequests().anyRequest().authenticated()

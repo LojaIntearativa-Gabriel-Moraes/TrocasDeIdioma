@@ -3,8 +3,8 @@ package com.example.TrocaDeIdioma.model;
 import javax.persistence.*;
 
 import lombok.*;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @NoArgsConstructor
@@ -14,10 +14,9 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@Builder
 @Data
 @Table(name = "users")
-public class User {
+public abstract class User {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,14 +34,20 @@ public class User {
   @Column
   private String senha;
 
-  @ElementCollection
-  private List<Idioma> idiomas;
-
-  @Column(name = "hourly_rate")
-  private Double hourlyRate;
+  @Column(name = "saldo")
+  private BigDecimal saldo;
 
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   @JoinColumn(name = "user_id")
   private List<Permissao> permissoes;
 
+
+
+  public void adicionarSaldo(BigDecimal valor) {
+    setSaldo(getSaldo().add(valor));
+  }
+
+  public void debitarSaldo(BigDecimal valorDaAula) {
+    setSaldo(getSaldo().subtract(valorDaAula));
+  }
 }

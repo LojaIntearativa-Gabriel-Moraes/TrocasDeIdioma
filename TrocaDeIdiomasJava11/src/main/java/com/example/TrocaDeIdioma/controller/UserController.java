@@ -4,6 +4,7 @@ import com.example.TrocaDeIdioma.model.Permissao;
 import com.example.TrocaDeIdioma.model.Response.IncluirUsuarioRequest;
 import com.example.TrocaDeIdioma.model.User;
 import com.example.TrocaDeIdioma.repository.UserRepository;
+import com.example.TrocaDeIdioma.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -28,9 +30,11 @@ public class UserController {
   @Autowired
   private PasswordEncoder passwordEncoder;
 
+  @Autowired
+  private UserService userService;
+
   @PostMapping
   public ResponseEntity<User> createUser(@RequestBody IncluirUsuarioRequest request) {
-    // Verifica se o e-mail já existe no banco de dados
     if (userRepository.findByEmail(request.getEmail()) != null) {
       throw new ResponseStatusException(HttpStatus.CONFLICT, "E-mail já cadastrado.");
     }
@@ -69,6 +73,8 @@ public class UserController {
 
     return ResponseEntity.ok(users);
   }
+
+
 
   // outros métodos do controlador, como atualização e exclusão do usuário
 }

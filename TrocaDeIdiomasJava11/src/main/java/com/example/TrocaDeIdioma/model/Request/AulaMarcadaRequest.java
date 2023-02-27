@@ -6,7 +6,7 @@ import com.example.TrocaDeIdioma.model.User;
 import java.time.LocalDateTime;
 
 
-public class AgendaRequest {
+public class AulaMarcadaRequest {
   private User user;
   private User partner;
   private LocalDateTime startTime;

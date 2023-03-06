@@ -1,5 +1,6 @@
 package com.example.TrocaDeIdioma.model;
 
+import com.example.TrocaDeIdioma.util.GetDiaSemana;
 import lombok.Data;
 import org.hibernate.engine.jdbc.dialect.spi.DialectFactory;
 
@@ -47,34 +48,19 @@ public class Disponibilidade {
   }
 
   public boolean isAvailable(LocalDateTime startTime) {
-    DayOfWeek dayOfWeek = startTime.getDayOfWeek();
-
-    DiaSemana diaSemana = formatarLocalDateTimeParaEnum(startTime);
+    DiaSemana diaSemana = GetDiaSemana.getDiaSemana(startTime.getDayOfWeek().toString());
+    LocalDateTime comecoDoTempo = startTime.plusMinutes(1);
     if (!diasDisponiveis.contains(diaSemana)) {
       return false; // O professor não está disponível nesse dia
     }
 
-    if (startTime.toLocalTime().isBefore(horaInicio) || startTime.toLocalTime().isAfter(horaFim)) {
+    if (comecoDoTempo.toLocalTime().isBefore(horaInicio.plusMinutes(1)) || comecoDoTempo.toLocalTime().isAfter(horaFim)) {
       return false; // O intervalo de tempo está fora dos limites de disponibilidade do professor
     }
 
     return true; // O professor está disponível no dia e horário especificados
   }
-  private DiaSemana formatarLocalDateTimeParaEnum(LocalDateTime dia) {
-    DayOfWeek dayOfWeek = dia.getDayOfWeek();
-    String diaSemanaFormatadoSemTraco = dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault()).toLowerCase().replace("-", "_");
-    String nomeDiaSemanaFormatado = diaSemanaFormatadoSemTraco.substring(0, 1).toUpperCase() + diaSemanaFormatadoSemTraco.substring(1);
-    String nomeDiaSemanaFormatadoSemAcento = removerAcentos(nomeDiaSemanaFormatado);
-    return DiaSemana.valueOf(nomeDiaSemanaFormatadoSemAcento);
-  }
 
-  private String removerAcentos(String texto) {
-    if (texto != null) {
-      texto = Normalizer.normalize(texto, Normalizer.Form.NFD);
-      texto = texto.replaceAll("[^\\p{ASCII}]", "");
-    }
-    return texto;
-  }
 
 }
 

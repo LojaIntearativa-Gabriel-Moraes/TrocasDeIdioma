@@ -33,7 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
       .cors().and()
 
       // deixa qualquer url com /publico como pública
-      .authorizeRequests().antMatchers("/*/publico", "ws/*", "/ws").permitAll().and()
+      .authorizeRequests().antMatchers("/*/publico", "/ws/*", "/ws").permitAll().and()
 
       // deixa POST /login e /usuarios público
       .authorizeRequests().antMatchers(HttpMethod.POST, "/login", "/users", "/professores", "/alunos").permitAll().and()

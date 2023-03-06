@@ -12,7 +12,7 @@ public class AulaResponse {
 
   private ProfessorResponse professor;
   private AlunoResponse aluno;
-
+  private int nota;
   private LocalDateTime dataHoraInicio;
 
   private LocalDateTime dataHoraFim;

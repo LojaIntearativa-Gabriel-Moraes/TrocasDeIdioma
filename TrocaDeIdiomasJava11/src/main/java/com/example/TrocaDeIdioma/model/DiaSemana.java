@@ -1,13 +1,13 @@
 package com.example.TrocaDeIdioma.model;
 
 public enum DiaSemana {
-  Segunda_feira("Segunda-feira"),
-  Terca_feira("Terça-feira"),
-  Quarta_feira("Quarta-feira"),
-  Quinta_feira("Quinta-feira"),
-  Sexta_feira("Sexta-feira"),
-  Sabado("Sábado"),
-  Domingo("Domingo");
+  Segunda_feira("Monday"),
+  Terca_feira("Tuesday"),
+  Quarta_feira("Wednesday"),
+  Quinta_feira("Thursday"),
+  Sexta_feira("Friday"),
+  Sabado("Saturday"),
+  Domingo("Sunday");
 
   private String descricao;
 
@@ -19,12 +19,12 @@ public enum DiaSemana {
     return descricao;
   }
 
-  public static DiaSemana fromValue(String value) {
-    for (DiaSemana dia : DiaSemana.values()) {
-      if (dia.descricao.equalsIgnoreCase(value)) {
-        return dia;
+  private DiaSemana getDiaSemana(String dia) {
+    for (DiaSemana diaSemana : DiaSemana.values()) {
+      if (diaSemana.getDescricao().equalsIgnoreCase(dia)) {
+        return diaSemana;
       }
     }
-    throw new IllegalArgumentException("Valor inválido para DiaSemana: " + value);
+    throw new IllegalArgumentException("Dia da semana inválido: " + dia);
   }
 }

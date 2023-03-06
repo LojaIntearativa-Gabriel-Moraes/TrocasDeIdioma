@@ -21,7 +21,6 @@ public class LoginController {
   public LoginResponse login() {
     LoginResponse response = new LoginResponse();
 
-
     response.setUsuarioId(usuarioAutenticadoService.getId());
     response.setSaldo(usuarioAutenticadoService.get().getSaldo());
     List<Permissao> roles = usuarioAutenticadoService.get().getPermissoes();

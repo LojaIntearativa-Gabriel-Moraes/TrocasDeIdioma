@@ -22,7 +22,7 @@ public class SolicitacaoAulaController {
   @PostMapping("/aula")
   @Secured("ROLE_ALUNO")
   public void solicitarAula(@RequestBody SolicitacaoAulaRequest request) {
-     solicitacaoAulaService.solicitarAula(request);
+    solicitacaoAulaService.solicitarAula(request);
   }
 
   @PutMapping("/{id}/aceitar")
@@ -36,7 +36,7 @@ public class SolicitacaoAulaController {
   @Secured("ROLE_PROFESSOR")
   public ResponseEntity<?> recusarSolicitacao(@PathVariable Long id) {
     solicitacaoAulaService.recusarSolicitacao(id);
-     return ResponseEntity.noContent().build();
+    return ResponseEntity.noContent().build();
   }
 
   @GetMapping("/recebidas")
@@ -47,8 +47,14 @@ public class SolicitacaoAulaController {
 
   @GetMapping("/enviadas")
   @Secured("ROLE_ALUNO")
-  public List<SolicitacaoAulaResponse> getAllSolicitacoesEnviadasAulas() {
+  public List<SolicitacaoAulaResponse> getAllSolicitacoesEnviadas() {
     return solicitacaoAulaService.getAllSolicitacoesEnviadas();
   }
+
+  @PutMapping("/{id}/cancelar")
+  public void CancelarSolicitacaoAula(@PathVariable Long id) {
+    solicitacaoAulaService.cancelarSolicitacaoAula(id);
+  }
+
 
 }

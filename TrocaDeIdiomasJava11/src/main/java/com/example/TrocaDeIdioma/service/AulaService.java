@@ -7,6 +7,7 @@ import com.example.TrocaDeIdioma.repository.UserRepository;
 import com.example.TrocaDeIdioma.service.security.UsuarioAutenticadoService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +17,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -86,12 +88,11 @@ public class AulaService {
     Aluno aluno = alunoService.porId(aula.getAluno().getId());
     aluno.adicionarSaldo(aula.getValorDaAula());
 
-
     save(aula);
   }
 
   @Transactional
-  public void concluirAula(Long aulaId) {
+  public void concluirAula(Long aulaId, int nota) {
 
     Aula aula = porId(aulaId);
 
@@ -101,7 +102,7 @@ public class AulaService {
 
     aula.setStatus(StatusAula.CONCLUIDA);
     aula.setDataHoraFim(LocalDateTime.now());
-
+    aula.setNota(nota);
     User professor = aula.getProfessor();
     BigDecimal valorDaAula = aula.getValorDaAula();
 
@@ -131,4 +132,28 @@ public class AulaService {
       return aulas.stream()
         .map(aula -> modelMapper.map(aula, AulaResponse.class)).collect(Collectors.toList());
   }
+
+  public boolean verificarSeEstaPermitido(Long id) {
+    Aula aula = porId(id);
+    return aula.getAluno().getId().equals(usuarioAutenticadoService.getId()) || aula.getProfessor().getId().equals(usuarioAutenticadoService.getId()) && aula.getStatus() == StatusAula.AGENDADA;
+  }
+
+  public List<AulaResponse> getAulasEncerradas() {
+    User user = usuarioAutenticadoService.get();
+    LocalDateTime dataAtual = LocalDateTime.now();
+    List<Aula> aulasEncerradas = repository.findAllByProfessorIdAndDataHoraFimBeforeAndStatusOrAlunoIdAndDataHoraFimBeforeAndStatus(user.getId(), dataAtual, StatusAula.AGENDADA, user.getId(), dataAtual, StatusAula.AGENDADA);
+    return aulasEncerradas.stream()
+      .map(aula -> modelMapper.map(aula, AulaResponse.class))
+      .collect(Collectors.toList());
+  }
+
+  public List<AulaResponse> getAllAulasConcluidas() {
+    Long id = usuarioAutenticadoService.getId();
+
+    List<Aula> aulas = repository.findAllByProfessorIdAndStatusOrAlunoIdAndStatus(id, StatusAula.CONCLUIDA, id, StatusAula.CONCLUIDA);
+    return aulas.stream()
+      .map(aula -> modelMapper.map(aula, AulaResponse.class)).collect(Collectors.toList());
+  }
+
+
 }

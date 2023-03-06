@@ -3,22 +3,25 @@ package com.example.TrocaDeIdioma.controller;
 import com.example.TrocaDeIdioma.model.Response.AulaResponse;
 import com.example.TrocaDeIdioma.service.AulaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/aulas")
 public class AulaController {
 
   @Autowired
   private AulaService aulaService;
 
-  @PostMapping("/{id}/concluir")
-  public ResponseEntity<?> concluirAula(@PathVariable Long id) {
-    aulaService.concluirAula(id);
+  @PutMapping("/{id}/concluir/{rating}")
+  public ResponseEntity<?> concluirAula(@PathVariable Long id, @PathVariable int rating) {
+    aulaService.concluirAula(id, rating);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
@@ -38,4 +41,18 @@ public class AulaController {
     return aulaService.getAllAulasAgendadas();
   }
 
+  @GetMapping("/concluidas")
+  public List<AulaResponse> getAllAulasConcluidas() {
+    return aulaService.getAllAulasConcluidas();
+  }
+
+  @GetMapping("/{id}/verificar/se/esta/permitido")
+  public boolean verificarSeEstaPermitido(@PathVariable Long id) {
+    return aulaService.verificarSeEstaPermitido(id);
+  }
+
+  @GetMapping("/encerradas")
+  public List<AulaResponse> getAulasEncerradas() {
+    return aulaService.getAulasEncerradas();
+  }
 }

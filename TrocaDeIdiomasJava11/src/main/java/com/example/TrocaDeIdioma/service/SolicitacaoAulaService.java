@@ -19,6 +19,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.*;
@@ -51,11 +52,11 @@ public class SolicitacaoAulaService {
     Aluno aluno = alunoService.alunoAutenticado();
     Professor professor = professorService.porId(request.getIdProfessor());
 
-    if(aluno.getSaldo().compareTo(professor.getValorPorHora()) < 0) {
-      throw new ResponseStatusException(BAD_REQUEST,"Saldo insuficiente");
+    if (aluno.getSaldo().compareTo(professor.getValorPorHora()) < 0) {
+      throw new ResponseStatusException(BAD_REQUEST, "Saldo insuficiente");
     }
-    if(!professor.getDisponibilidade().isAvailable(request.getDataHoraInicio())){
-      throw new ResponseStatusException(BAD_REQUEST,"Professor indisponivel");
+    if (!professor.getDisponibilidade().isAvailable(request.getDataHoraInicio())) {
+      throw new ResponseStatusException(BAD_REQUEST, "Professor indisponivel");
     }
 
     SolicitacaoAula solicitacao = new SolicitacaoAula();
@@ -87,12 +88,12 @@ public class SolicitacaoAulaService {
 
     SolicitacaoAula solicitacao = porId(id);
 
-    if(solicitacao.getProfessor().getId() != usuarioLogado.getId()) {
-      throw new ResponseStatusException(BAD_REQUEST,"Voce nao tem permissão para isso");
+    if (solicitacao.getProfessor().getId() != usuarioLogado.getId()) {
+      throw new ResponseStatusException(BAD_REQUEST, "Voce nao tem permissão para isso");
     }
 
     if (solicitacao.getStatus() != StatusSolicitacaoAula.PENDENTE) {
-      throw new ResponseStatusException(NOT_FOUND,"Não é possível confirmar uma aula que não está pendente");
+      throw new ResponseStatusException(NOT_FOUND, "Não é possível confirmar uma aula que não está pendente");
     }
 
     solicitacao.setStatus(StatusSolicitacaoAula.ACEITO);
@@ -129,12 +130,12 @@ public class SolicitacaoAulaService {
 
     SolicitacaoAula solicitacao = porId(id);
 
-    if(solicitacao.getProfessor().getId() != usuarioLogado.getId()) {
-      throw new ResponseStatusException(BAD_REQUEST,"Voce nao tem permissão para isso");
+    if (solicitacao.getProfessor().getId() != usuarioLogado.getId()) {
+      throw new ResponseStatusException(BAD_REQUEST, "Voce nao tem permissão para isso");
     }
 
     if (solicitacao.getStatus() != StatusSolicitacaoAula.PENDENTE) {
-      throw new ResponseStatusException(NOT_FOUND,"Não é possível recusar uma aula que não está pendente");
+      throw new ResponseStatusException(NOT_FOUND, "Não é possível recusar uma aula que não está pendente");
     }
 
     solicitacao.setStatus(StatusSolicitacaoAula.RECUSADO);
@@ -164,10 +165,36 @@ public class SolicitacaoAulaService {
 
   public List<SolicitacaoAulaResponse> getAllSolicitacoesEnviadas() {
 
-      Aluno aluno = alunoService.alunoAutenticado();
-      List<SolicitacaoAula> solicitacoes = solicitacaoAulaRepository.findAllByAlunoIdAndStatus(aluno.getId(), StatusSolicitacaoAula.PENDENTE);
-      return solicitacoes.stream()
-        .map(solicitacao -> modelMapper.map(solicitacao, SolicitacaoAulaResponse.class))
-        .collect(Collectors.toList());
+    Aluno aluno = alunoService.alunoAutenticado();
+    List<SolicitacaoAula> solicitacoes = solicitacaoAulaRepository.findAllByAlunoIdAndStatus(aluno.getId(), StatusSolicitacaoAula.PENDENTE);
+    return solicitacoes.stream()
+      .map(solicitacao -> modelMapper.map(solicitacao, SolicitacaoAulaResponse.class))
+      .collect(Collectors.toList());
   }
+
+
+  @Transactional
+  public void cancelarSolicitacaoAula(Long id) {
+
+    Aluno usuarioLogado = alunoService.alunoAutenticado();
+
+    SolicitacaoAula solicitacao = porId(id);
+
+    if (!solicitacao.getAluno().getId().equals(usuarioLogado.getId()) && !solicitacao.getProfessor().getId().equals(usuarioLogado.getId())) {
+      throw new ResponseStatusException(BAD_REQUEST, "Você não tem permissão para cancelar essa solicitação");
+    }
+
+    if (solicitacao.getStatus() != StatusSolicitacaoAula.PENDENTE) {
+      throw new ResponseStatusException(BAD_REQUEST, "Não é possível cancelar uma solicitação que não está pendente");
+    }
+
+    solicitacao.setStatus(StatusSolicitacaoAula.CANCELADO);
+
+    solicitacao.getAluno().adicionarSaldo(solicitacao.getProfessor().getValorPorHora());
+
+    solicitacaoAulaRepository.save(solicitacao);
+    professorService.salvar(solicitacao.getProfessor());
+  }
+
+
 }

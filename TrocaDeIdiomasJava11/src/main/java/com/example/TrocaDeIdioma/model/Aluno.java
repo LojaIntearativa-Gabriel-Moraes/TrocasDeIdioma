@@ -1,5 +1,6 @@
 package com.example.TrocaDeIdioma.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -17,6 +18,7 @@ import java.util.List;
 
 public class Aluno extends User {
 
+  @JsonIgnore
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "aluno")
   private List<SolicitacaoAula> solicitacoesEnviadasAulas;
 

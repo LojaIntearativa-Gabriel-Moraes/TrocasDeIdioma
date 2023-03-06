@@ -1,7 +1,6 @@
 package com.example.TrocaDeIdioma.service;
 
 import com.example.TrocaDeIdioma.model.Aluno;
-import com.example.TrocaDeIdioma.model.Professor;
 import com.example.TrocaDeIdioma.repository.AlunoRepository;
 import com.example.TrocaDeIdioma.service.security.UsuarioAutenticadoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +19,11 @@ public class AlunoService {
 
 
   public Aluno porId(Long id) {
-    return repository.findById(usuarioAutenticadoService.getId())
+    return repository.findById(id)
       .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Aluno não encontrado"));
+  }
+   public Aluno alunoAutenticado() {
+    return repository.findById(usuarioAutenticadoService.getId()).get();
   }
 
   public void salvar(Aluno aluno) {

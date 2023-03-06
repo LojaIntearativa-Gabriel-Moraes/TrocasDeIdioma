@@ -1,24 +1,24 @@
 package com.example.TrocaDeIdioma.controller;
 
+import com.example.TrocaDeIdioma.mapper.IncluirUsuarioMapper;
 import com.example.TrocaDeIdioma.model.Permissao;
-import com.example.TrocaDeIdioma.model.Response.IncluirUsuarioRequest;
+import com.example.TrocaDeIdioma.model.Professor;
+import com.example.TrocaDeIdioma.model.Request.IncluirUsuarioRequest;
 import com.example.TrocaDeIdioma.model.User;
+import com.example.TrocaDeIdioma.repository.ProfessorRepository;
 import com.example.TrocaDeIdioma.repository.UserRepository;
 import com.example.TrocaDeIdioma.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalTime;
-import java.util.ArrayList;
+import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
-import static com.example.TrocaDeIdioma.mapper.IncluirUsuarioMapper.toEntity;
 
 @RestController
 @RequestMapping("/users")
@@ -31,7 +31,26 @@ public class UserController {
   private PasswordEncoder passwordEncoder;
 
   @Autowired
+  private ProfessorRepository professorRepository;
+  @Autowired
   private UserService userService;
+
+  @PostMapping
+  public ResponseEntity<User> createUser(@RequestBody IncluirUsuarioRequest request) {
+    if (userRepository.findByEmail(request.getEmail()) != null) {
+      throw new ResponseStatusException(HttpStatus.CONFLICT, "E-mail já cadastrado.");
+    }
+    request.setSenha(passwordEncoder.encode(request.getSenha()));
+
+    User usuario = IncluirUsuarioMapper.toEntity(request);
+    usuario.setPermissoes(Arrays.asList(new Permissao("USER")));
+
+    usuario.setSaldo(BigDecimal.ZERO);
+
+    userRepository.save(usuario);
+
+    return ResponseEntity.status(HttpStatus.CREATED).body(usuario);
+  }
 
   @GetMapping("/{id}")
   public ResponseEntity<User> getUserById(@PathVariable Long id) {

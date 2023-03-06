@@ -1,7 +1,7 @@
 package com.example.TrocaDeIdioma.mapper;
 
 
-import com.example.TrocaDeIdioma.model.Response.IncluirUsuarioRequest;
+import com.example.TrocaDeIdioma.model.Request.IncluirUsuarioRequest;
 import com.example.TrocaDeIdioma.model.User;
 import org.modelmapper.ModelMapper;
 

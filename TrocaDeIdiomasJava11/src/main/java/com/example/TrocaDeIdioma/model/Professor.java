@@ -25,7 +25,6 @@ public class Professor extends User {
   @Column(name = "valor_por_hora")
   private BigDecimal valorPorHora;
 
-
   @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
   private Disponibilidade disponibilidade;
 

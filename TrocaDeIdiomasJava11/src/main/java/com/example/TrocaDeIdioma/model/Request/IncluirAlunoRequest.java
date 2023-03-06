@@ -1,4 +1,4 @@
-package com.example.TrocaDeIdioma.model.Response;
+package com.example.TrocaDeIdioma.model.Request;
 
 import lombok.Data;
 
@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Data
-public class IncluirUsuarioRequest {
+public class IncluirAlunoRequest {
 
     @NotBlank
     private String firstName;
@@ -18,8 +18,5 @@ public class IncluirUsuarioRequest {
     @NotBlank
     private String senha;
 
-    private List<String> idiomas;
-
-    private BigDecimal valorPorHora;
-
+    private Long nivel;
 }

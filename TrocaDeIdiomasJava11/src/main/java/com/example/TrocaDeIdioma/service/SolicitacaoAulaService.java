@@ -2,11 +2,13 @@ package com.example.TrocaDeIdioma.service;
 
 import com.example.TrocaDeIdioma.model.*;
 import com.example.TrocaDeIdioma.model.Request.SolicitacaoAulaRequest;
+import com.example.TrocaDeIdioma.model.Response.SolicitacaoAulaResponse;
 import com.example.TrocaDeIdioma.repository.AulaRepository;
 import com.example.TrocaDeIdioma.repository.SolicitacaoAulaRepository;
 import com.example.TrocaDeIdioma.repository.UserRepository;
 import com.example.TrocaDeIdioma.service.security.BuscarUsuarioSecuritySerivce;
 import com.example.TrocaDeIdioma.service.security.UsuarioAutenticadoService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -39,31 +42,39 @@ public class SolicitacaoAulaService {
   private AulaRepository aulaRepository;
 
   @Autowired
-  private UsuarioAutenticadoService buscarUsuarioAutenticadoService;
+  private ModelMapper modelMapper;
+
 
   @Transactional
   public void solicitarAula(SolicitacaoAulaRequest request) {
 
-    Aluno aluno = alunoService.porId(request.getIdAluno());
+    Aluno aluno = alunoService.alunoAutenticado();
     Professor professor = professorService.porId(request.getIdProfessor());
+
+    if(aluno.getSaldo().compareTo(professor.getValorPorHora()) < 0) {
+      throw new ResponseStatusException(BAD_REQUEST,"Saldo insuficiente");
+    }
+    if(!professor.getDisponibilidade().isAvailable(request.getDataHoraInicio())){
+      throw new ResponseStatusException(BAD_REQUEST,"Professor indisponivel");
+    }
 
     SolicitacaoAula solicitacao = new SolicitacaoAula();
     solicitacao.setAluno(aluno);
     solicitacao.setProfessor(professor);
 
     solicitacao.setDataHoraInicio(request.getDataHoraInicio());
-    solicitacao.setDataHoraFim(request.getDataHoraFim());
+    solicitacao.setDataHoraFim(request.getDataHoraInicio().plusHours(1));
     solicitacao.setIdioma(request.getIdioma());
 
     solicitacao.setNivel(aluno.getNivel());
     solicitacao.setStatus(StatusSolicitacaoAula.PENDENTE);
-
+    solicitacao.setValorAula(professor.getValorPorHora());
     solicitacaoAulaRepository.save(solicitacao);
 
     aluno.adicionarSolicitacaoAula(solicitacao);
     professor.adicionarSolicitacaoAula(solicitacao);
 
-    aluno.debitarSaldo(solicitacao.getValorHora());
+    aluno.debitarSaldo(professor.getValorPorHora());
 
     alunoService.salvar(aluno);
     professorService.salvar(professor);
@@ -72,9 +83,7 @@ public class SolicitacaoAulaService {
   @Transactional
   public void aceitarSolicitacao(Long id) {
 
-    User usuarioLogado = buscarUsuarioAutenticadoService.get();
-
-
+    Professor usuarioLogado = professorService.professorAutenticado();
 
     SolicitacaoAula solicitacao = porId(id);
 
@@ -96,6 +105,7 @@ public class SolicitacaoAulaService {
       .idioma(solicitacao.getIdioma())
       .nivel(solicitacao.getNivel())
       .valorDaAula(solicitacao.getProfessor().getValorPorHora())
+      .status(StatusAula.AGENDADA)
       .build();
 
     Professor professor = solicitacao.getProfessor();
@@ -115,7 +125,8 @@ public class SolicitacaoAulaService {
 
   @Transactional
   public void recusarSolicitacao(Long id) {
-    User usuarioLogado = buscarUsuarioAutenticadoService.get();
+    Professor usuarioLogado = professorService.professorAutenticado();
+
     SolicitacaoAula solicitacao = porId(id);
 
     if(solicitacao.getProfessor().getId() != usuarioLogado.getId()) {
@@ -128,7 +139,8 @@ public class SolicitacaoAulaService {
 
     solicitacao.setStatus(StatusSolicitacaoAula.RECUSADO);
 
-    solicitacao.getAluno().removerSolicitacaoAula(solicitacao);
+    solicitacao.getAluno().adicionarSaldo(solicitacao.getProfessor().getValorPorHora());
+
 
     solicitacaoAulaRepository.save(solicitacao);
     alunoService.salvar(solicitacao.getAluno());
@@ -138,5 +150,24 @@ public class SolicitacaoAulaService {
   public SolicitacaoAula porId(Long id) {
     return solicitacaoAulaRepository.findById(id)
       .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "SolicitacaoAula não encontrado"));
+  }
+
+  public List<SolicitacaoAulaResponse> getAllSolicitacoesRecebidas() {
+
+    Professor professor = professorService.professorAutenticado();
+    List<SolicitacaoAula> solicitacoes = solicitacaoAulaRepository.findAllByProfessorIdAndStatus(professor.getId(), StatusSolicitacaoAula.PENDENTE);
+    return solicitacoes.stream()
+      .map(solicitacao -> modelMapper.map(solicitacao, SolicitacaoAulaResponse.class))
+      .collect(Collectors.toList());
+
+  }
+
+  public List<SolicitacaoAulaResponse> getAllSolicitacoesEnviadas() {
+
+      Aluno aluno = alunoService.alunoAutenticado();
+      List<SolicitacaoAula> solicitacoes = solicitacaoAulaRepository.findAllByAlunoIdAndStatus(aluno.getId(), StatusSolicitacaoAula.PENDENTE);
+      return solicitacoes.stream()
+        .map(solicitacao -> modelMapper.map(solicitacao, SolicitacaoAulaResponse.class))
+        .collect(Collectors.toList());
   }
 }

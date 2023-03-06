@@ -1,10 +1,13 @@
 package com.example.TrocaDeIdioma.controller;
 
+import com.example.TrocaDeIdioma.model.Response.AulaResponse;
 import com.example.TrocaDeIdioma.service.AulaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/aulas")
@@ -29,6 +32,10 @@ public class AulaController {
   public ResponseEntity<?> professorCancelarAula(@PathVariable Long id) {
     aulaService.professorCancelarAula(id);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+  }
+  @GetMapping("/agendadas")
+  public List<AulaResponse> getAllAulasAgendadas() {
+    return aulaService.getAllAulasAgendadas();
   }
 
 }

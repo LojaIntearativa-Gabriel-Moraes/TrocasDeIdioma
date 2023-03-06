@@ -1,13 +1,13 @@
 package com.example.TrocaDeIdioma.model;
 
 public enum DiaSemana {
-  SEGUNDA_FEIRA("Segunda-feira"),
-  TERCA_FEIRA("Terça-feira"),
-  QUARTA_FEIRA("Quarta-feira"),
-  QUINTA_FEIRA("Quinta-feira"),
-  SEXTA_FEIRA("Sexta-feira"),
-  SABADO("Sábado"),
-  DOMINGO("Domingo");
+  Segunda_feira("Segunda-feira"),
+  Terca_feira("Terça-feira"),
+  Quarta_feira("Quarta-feira"),
+  Quinta_feira("Quinta-feira"),
+  Sexta_feira("Sexta-feira"),
+  Sabado("Sábado"),
+  Domingo("Domingo");
 
   private String descricao;
 

@@ -13,11 +13,8 @@ spring:
     password: 1234
   jpa:
     hibernate:
-
-
       #ddl-auto: create-drop
       #ddl-auto: none
-
       #ddl-auto: validate
       ddl-auto: update
   session:

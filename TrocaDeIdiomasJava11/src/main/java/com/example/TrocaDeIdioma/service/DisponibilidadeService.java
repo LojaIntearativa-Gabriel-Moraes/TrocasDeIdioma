@@ -1,25 +1,35 @@
 package com.example.TrocaDeIdioma.service;
 
+import com.example.TrocaDeIdioma.mapper.DisponibilidadeMapper;
+import com.example.TrocaDeIdioma.model.Request.DisponibilidadeRequest;
+import com.example.TrocaDeIdioma.model.Response.DisponibilidadeResponse;
 import com.example.TrocaDeIdioma.model.Disponibilidade;
 import com.example.TrocaDeIdioma.model.Professor;
+import com.example.TrocaDeIdioma.model.User;
 import com.example.TrocaDeIdioma.repository.DisponibilidadeRepository;
-import com.example.TrocaDeIdioma.repository.ProfessorRepository;
+import com.example.TrocaDeIdioma.service.security.UsuarioAutenticadoService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class DisponibilidadeService {
 
   @Autowired
   private ProfessorService professorService;
+
+  @Autowired
+  private UsuarioAutenticadoService usuarioAutenticadoService;
+
   private final DisponibilidadeRepository disponibilidadeRepository;
 
 
+  @Autowired
+  private ModelMapper modelMapper;
   public DisponibilidadeService(DisponibilidadeRepository disponibilidadeRepository) {
     this.disponibilidadeRepository = disponibilidadeRepository;
   }
@@ -32,8 +42,11 @@ public class DisponibilidadeService {
     return disponibilidadeRepository.save(disponibilidade);
   }
 
-  public List<Disponibilidade> findAll() {
-    return disponibilidadeRepository.findAll();
+  public List<DisponibilidadeResponse> findAll() {
+    List<Disponibilidade> disponibilidades = disponibilidadeRepository.findAll();
+    return  disponibilidades.stream()
+      .map(disponibilidade -> modelMapper.map(disponibilidade, DisponibilidadeResponse.class))
+      .collect(Collectors.toList());
   }
 
   public Disponibilidade findById(Long id) {
@@ -46,12 +59,13 @@ public class DisponibilidadeService {
   }
 
 
-  public Disponibilidade update(Long id, Disponibilidade disponibilidade) {
-    Disponibilidade disponibilidadeUpdate = findById(id);
-    disponibilidadeUpdate.setHoraInicio(disponibilidade.getHoraInicio());
-    disponibilidadeUpdate.setHoraFim(disponibilidade.getHoraFim());
-    disponibilidade.setDiasDisponiveis(disponibilidade.getDiasDisponiveis());
-    disponibilidadeUpdate.setUser(disponibilidade.getUser());
-    return disponibilidadeRepository.save(disponibilidadeUpdate);
+  public void update(DisponibilidadeRequest disponibilidade) {
+
+    Professor professor = professorService.professorAutenticado();
+
+    professor.getDisponibilidade().setHoraInicio(disponibilidade.getHoraInicio());
+    professor.getDisponibilidade().setHoraFim(disponibilidade.getHoraFim());
+    professor.getDisponibilidade().setDiasDisponiveis(disponibilidade.getDiasDisponiveis());
+    disponibilidadeRepository.save(professor.getDisponibilidade());
   }
 }

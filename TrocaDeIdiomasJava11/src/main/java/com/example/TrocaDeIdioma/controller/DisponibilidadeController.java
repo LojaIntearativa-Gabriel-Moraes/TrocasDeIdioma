@@ -1,31 +1,38 @@
 package com.example.TrocaDeIdioma.controller;
 
 import com.example.TrocaDeIdioma.model.Disponibilidade;
+import com.example.TrocaDeIdioma.model.Request.DisponibilidadeRequest;
+import com.example.TrocaDeIdioma.model.Response.DisponibilidadeResponse;
 import com.example.TrocaDeIdioma.service.DisponibilidadeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/disponibilidades")
+@RequestMapping("/disponibilidades")
 public class DisponibilidadeController {
 
   @Autowired
   private DisponibilidadeService disponibilidadeService;
 
   @PostMapping
+  @Secured("ROLE_PROFESSOR")
   public ResponseEntity<Disponibilidade> save(@RequestBody Disponibilidade disponibilidade) {
     Disponibilidade result = disponibilidadeService.save(disponibilidade);
     return ResponseEntity.ok(result);
   }
 
   @GetMapping
-  public ResponseEntity<List<Disponibilidade>> findAll() {
-    List<Disponibilidade> disponibilidades = disponibilidadeService.findAll();
-    return ResponseEntity.ok(disponibilidades);
+  public List<DisponibilidadeResponse> findAll() {
+    return disponibilidadeService.findAll();
+  }
+  @GetMapping("/entre")
+  public List<DisponibilidadeResponse> findAllBetweenHours() {
+    return disponibilidadeService.findAll();
   }
 
   @GetMapping("/{id}")
@@ -34,10 +41,10 @@ public class DisponibilidadeController {
     return ResponseEntity.ok(disponibilidade);
   }
 
-  @PutMapping("/{id}")
-  public ResponseEntity<Disponibilidade> update(@PathVariable Long id, @RequestBody Disponibilidade disponibilidade) {
-    Disponibilidade result = disponibilidadeService.update(id, disponibilidade);
-    return ResponseEntity.ok(result);
+  @PutMapping()
+  @Secured("ROLE_PROFESSOR")
+  public void update(@RequestBody DisponibilidadeRequest disponibilidade) {
+    disponibilidadeService.update(disponibilidade);
   }
 
   @DeleteMapping("/{id}")

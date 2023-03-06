@@ -1,9 +1,11 @@
 package com.example.TrocaDeIdioma.service;
 
 import com.example.TrocaDeIdioma.model.*;
+import com.example.TrocaDeIdioma.model.Response.AulaResponse;
 import com.example.TrocaDeIdioma.repository.AulaRepository;
 import com.example.TrocaDeIdioma.repository.UserRepository;
 import com.example.TrocaDeIdioma.service.security.UsuarioAutenticadoService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,9 @@ import org.springframework.web.server.ResponseStatusException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -34,6 +39,9 @@ public class AulaService {
 
   @Autowired
   private UserRepository userRepository;
+
+  @Autowired
+  private ModelMapper modelMapper;
   @Transactional
   public void alunoCancelarAula(Long aulaId) {
 
@@ -110,5 +118,17 @@ public class AulaService {
       .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Aula não encontrado"));
   }
 
+  public List<AulaResponse> getAllAulasAgendadas() {
+    List<Aula> aulas = new ArrayList<>();
+    if(usuarioAutenticadoService.get().getUsuarioTipo() == UsuarioTipo.PROFESSOR){
+      aulas = repository.findAllByProfessorIdAndStatus(usuarioAutenticadoService.getId(), StatusAula.AGENDADA);
+    }
 
+    if(usuarioAutenticadoService.get().getUsuarioTipo() == UsuarioTipo.ALUNO){
+      aulas = repository.findAllByAlunoIdAndStatus(usuarioAutenticadoService.getId(), StatusAula.AGENDADA);
+    }
+
+      return aulas.stream()
+        .map(aula -> modelMapper.map(aula, AulaResponse.class)).collect(Collectors.toList());
+  }
 }

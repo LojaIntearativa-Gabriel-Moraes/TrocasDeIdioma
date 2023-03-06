@@ -32,8 +32,8 @@ public class SolicitacaoAula {
   @Column()
   private Long nivel;
 
-  @Column(name = "valor_hora")
-  private BigDecimal valorHora;
+  @Column(name = "valor_aula")
+  private BigDecimal valorAula;
 
   @Column(name = "status")
   @Enumerated(EnumType.STRING)

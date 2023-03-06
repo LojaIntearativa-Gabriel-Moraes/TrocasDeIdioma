@@ -33,10 +33,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
       .cors().and()
 
       // deixa qualquer url com /publico como pública
-      .authorizeRequests().antMatchers("/*/publico").permitAll().and()
+      .authorizeRequests().antMatchers("/*/publico", "ws/*", "/ws").permitAll().and()
 
       // deixa POST /login e /usuarios público
-      .authorizeRequests().antMatchers(HttpMethod.POST, "/login", "/users", "/professores").permitAll().and()
+      .authorizeRequests().antMatchers(HttpMethod.POST, "/login", "/users", "/professores", "/alunos").permitAll().and()
 
       // todas as urls devem ser acessadas por um usuário autenticado (privadas)
       .authorizeRequests().anyRequest().authenticated()

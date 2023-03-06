@@ -16,7 +16,7 @@ import java.util.List;
 @Entity
 @Data
 @Table(name = "users")
-public abstract class User {
+public class User {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,16 +31,20 @@ public abstract class User {
   @Column(unique = true)
   private String email;
 
+  @Column(name = "tipo")
+  @Enumerated(EnumType.STRING)
+  private UsuarioTipo usuarioTipo;
+
   @Column
   private String senha;
 
   @Column(name = "saldo")
   private BigDecimal saldo;
 
+
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   @JoinColumn(name = "user_id")
   private List<Permissao> permissoes;
-
 
 
   public void adicionarSaldo(BigDecimal valor) {

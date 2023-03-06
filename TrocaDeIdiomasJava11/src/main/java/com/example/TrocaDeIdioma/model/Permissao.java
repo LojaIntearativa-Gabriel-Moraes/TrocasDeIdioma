@@ -18,4 +18,11 @@ public class Permissao {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
     private String nome;
+
+    public Permissao(String nome) {
+        this.nome = nome;
+    }
+
+    public Permissao() {
+    }
 }
